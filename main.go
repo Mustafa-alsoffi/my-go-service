@@ -5,24 +5,26 @@ import (
 	"net/http"
 	"my-go-service/middlewares"
 	"my-go-service/utils"
-
-	"github.com/gorilla/mux"
 )
 
 func main() {
-
+	// Create a new ServeMux instance
 	mux := http.NewServeMux()
 
-	// Middlewares
-	ux.HandleFunc(middlewares.LoggingMiddleware)
-	ux.HandleFunc(middlewares.RateLimitMiddleware)
-	ux.HandleFunc(middlewares.ErrorHandlingMiddleware)
-	ux.HandleFunc(middlewares.AuthMiddleware)
-
 	// Routes
-	router.HandleFunc("/health", utils.HealthCheckHandler).Methods("GET")
-	router.Handle("/metrics", middlewares.MetricsHandler())
+	mux.HandleFunc("/health", utils.HealthCheckHandler)
+	mux.HandleFunc("/metrics", middlewares.MetricsHandler)
+	
 
+	handler := middlewares.LoggingMiddleware(
+		middlewares.RateLimitMiddleware(
+			middlewares.ErrorHandlingMiddleware(
+				mux,
+			),
+		),
+	)
+
+	// Start the server
 	log.Println("Server starting on port 8080")
-	http.ListenAndServe(":8080", router)
+	http.ListenAndServe(":8080", handler)
 }
