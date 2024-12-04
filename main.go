@@ -77,7 +77,9 @@ func main() {
 
 	// Routes
 	mux.HandleFunc("/health", utils.HealthCheckHandler)
-	mux.HandleFunc("/metrics", middlewares.MetricsHandler)
+	mux.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
+		middlewares.MetricsHandler().ServeHTTP(w, r)
+	})
 	mux.HandleFunc("/signup", SignupHandler)
 	mux.HandleFunc("/login", LoginHandler)
 
