@@ -82,7 +82,9 @@ func main() {
 	})
 	mux.HandleFunc("/signup", SignupHandler)
 	mux.HandleFunc("/login", LoginHandler)
-
+	mux.Handle("/test-rate-limit", middlewares.RateLimitMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Request successful"))
+	})))
 	handler := middlewares.LoggingMiddleware(
 		middlewares.RateLimitMiddleware(
 			middlewares.ErrorHandlingMiddleware(
